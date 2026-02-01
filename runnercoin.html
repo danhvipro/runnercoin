@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runner Game</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Khung game – tự co giãn cho điện thoại / ipad / máy tính */
+    #game {
+      position: relative;
+      width: 95vw;
+      max-width: 900px;
+      aspect-ratio: 9 / 16;
+      background: linear-gradient(#7ec8ff, #dff3ff); /* hình nền */
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    /* Thanh tiền */
+    #money {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: white;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    /* Nút nhân vật */
+    #character-btn {
+      position: absolute;
+      top: 70px;
+      right: 15px;
+      width: 70px;
+      height: 70px;
+      background: white;
+      border-radius: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    /* Nút dưới */
+    #buttons {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border-radius: 20px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .play {
+      background: #4caf50;
+      color: white;
+    }
+
+    .afk {
+      background: #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game">
+    <div id="money">💰 00000</div>
+
+    <div id="character-btn">nhân<br>vật</div>
+
+    <div id="buttons">
+      <button class="btn play">PLAY</button>
+      <button class="btn afk">AFK</button>
+    </div>
+  </div>
+</body>
+</html>
