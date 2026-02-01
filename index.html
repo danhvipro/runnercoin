@@ -14,6 +14,7 @@
     }
 
     body {
+      width: 100vw;
       height: 100vh;
       background: #111;
       display: flex;
@@ -21,19 +22,15 @@
       align-items: center;
     }
 
-    /* Khung game – tự co giãn cho điện thoại / ipad / máy tính */
-    #game {
+    /* KHUNG GAME CHÍNH */
+    .game {
+      background: linear-gradient(#cfeeff, #e9f7ff);
       position: relative;
-      width: 95vw;
-      max-width: 900px;
-      aspect-ratio: 9 / 16;
-      background: linear-gradient(#7ec8ff, #dff3ff); /* hình nền */
-      border-radius: 30px;
       overflow: hidden;
     }
 
-    /* Thanh tiền */
-    #money {
+    /* HUD */
+    .score {
       position: absolute;
       top: 15px;
       left: 15px;
@@ -41,26 +38,26 @@
       padding: 8px 14px;
       border-radius: 20px;
       font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    /* Nút nhân vật */
-    #character-btn {
+    .character {
       position: absolute;
-      top: 70px;
-      right: 15px;
+      top: 80px;
+      right: 20px;
       width: 70px;
-      height: 70px;
-      background: white;
+      height: 90px;
+      background: #fff;
       border-radius: 15px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 14px;
+      justify-content: center;
       font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    /* Nút dưới */
-    #buttons {
+    /* NÚT */
+    .buttons {
       position: absolute;
       bottom: 20px;
       width: 100%;
@@ -69,36 +66,62 @@
       gap: 20px;
     }
 
-    .btn {
+    button {
       padding: 12px 30px;
-      border-radius: 20px;
-      border: none;
       font-size: 16px;
-      font-weight: bold;
+      border-radius: 25px;
+      border: 2px solid #333;
       cursor: pointer;
     }
 
     .play {
-      background: #4caf50;
+      background: #4CAF50;
       color: white;
+      border: none;
     }
 
     .afk {
-      background: #ddd;
+      background: #eee;
+    }
+
+    /* ======================
+       ĐIỆN THOẠI (DỌC)
+    ====================== */
+    @media (max-width: 767px) {
+      .game {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+      }
+    }
+
+    /* ======================
+       MÁY TÍNH / IPAD (NGANG)
+    ====================== */
+    @media (min-width: 768px) {
+      .game {
+        width: 90vw;
+        height: 90vh;
+        border-radius: 30px;
+      }
+
+      .buttons {
+        bottom: 40px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div id="game">
-    <div id="money">💰 00000</div>
+  <div class="game">
+    <div class="score">💰 00000</div>
+    <div class="character">Nhân vật</div>
 
-    <div id="character-btn">nhân<br>vật</div>
-
-    <div id="buttons">
-      <button class="btn play">PLAY</button>
-      <button class="btn afk">AFK</button>
+    <div class="buttons">
+      <button class="play">PLAY</button>
+      <button class="afk">AFK</button>
     </div>
   </div>
 </body>
 </html>
+
