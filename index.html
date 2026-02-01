@@ -1,127 +1,144 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Runner Game</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runner Coin</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-    body {
-      width: 100vw;
-      height: 100vh;
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+body {
+  margin: 0;
+  background: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    /* KHUNG GAME CHÍNH */
-    .game {
-      background: linear-gradient(#cfeeff, #e9f7ff);
-      position: relative;
-      overflow: hidden;
-    }
+/* KHUNG GAME */
+.game {
+  position: relative;
+  width: 95vw;
+  height: 95vh;
+  max-width: 900px;
+  max-height: 500px;
+  background: #fff;
+  border-radius: 40px;
+  border: 4px solid #000;
+  overflow: hidden;
 
-    /* HUD */
-    .score {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: white;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
+  /* HÌNH NỀN */
+  background-image: url("https://picsum.photos/800/400");
+  background-size: cover;
+  background-position: center;
+}
 
-    .character {
-      position: absolute;
-      top: 80px;
-      right: 20px;
-      width: 70px;
-      height: 90px;
-      background: #fff;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
+/* TIỀN */
+.money {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 8px 18px;
+  border: 3px solid #000;
+  border-radius: 20px;
+  background: #fff;
+  font-weight: bold;
+}
 
-    /* NÚT */
-    .buttons {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
+/* SHOP NHÂN VẬT */
+.shop {
+  position: absolute;
+  top: 80px;
+  right: 15px;
+  padding: 14px 12px;
+  border: 3px solid #000;
+  border-radius: 15px;
+  background: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    button {
-      padding: 12px 30px;
-      font-size: 16px;
-      border-radius: 25px;
-      border: 2px solid #333;
-      cursor: pointer;
-    }
+/* NÚT DƯỚI */
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 15px;
+}
 
-    .play {
-      background: #4CAF50;
-      color: white;
-      border: none;
-    }
+button {
+  padding: 12px 30px;
+  border: 3px solid #000;
+  border-radius: 15px;
+  background: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
 
-    .afk {
-      background: #eee;
-    }
+button:hover {
+  background: #eee;
+}
 
-    /* ======================
-       ĐIỆN THOẠI (DỌC)
-    ====================== */
-    @media (max-width: 767px) {
-      .game {
-        width: 100vw;
-        height: 100vh;
-        border-radius: 0;
-      }
-    }
+/* MOBILE */
+@media (max-width: 600px) {
+  .game {
+    max-width: 360px;
+    max-height: 640px;
+    border-radius: 50px;
+  }
 
-    /* ======================
-       MÁY TÍNH / IPAD (NGANG)
-    ====================== */
-    @media (min-width: 768px) {
-      .game {
-        width: 90vw;
-        height: 90vh;
-        border-radius: 30px;
-      }
+  .controls {
+    bottom: 25px;
+  }
+}
 
-      .buttons {
-        bottom: 40px;
-      }
-    }
-  </style>
+/* PC / IPAD */
+@media (min-width: 601px) {
+  .money {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="game">
-    <div class="score">💰 00000</div>
-    <div class="character">Nhân vật</div>
 
-    <div class="buttons">
-      <button class="play">PLAY</button>
-      <button class="afk">AFK</button>
-    </div>
+<div class="game">
+  <div class="money">💰 00000</div>
+
+  <div class="shop">nhân<br>vật</div>
+
+  <div class="controls">
+    <button onclick="play()">play</button>
+    <button onclick="afk()">afk</button>
   </div>
+</div>
+
+<script>
+let money = 0;
+
+function play() {
+  money += 10;
+  updateMoney();
+}
+
+function afk() {
+  money += 1;
+  updateMoney();
+}
+
+function updateMoney() {
+  document.querySelector(".money").innerText = "💰 " + money.toString().padStart(5, "0");
+}
+</script>
+
 </body>
 </html>
-
