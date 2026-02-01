@@ -2,142 +2,207 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Runner Coin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+*{
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+body{
+    margin:0;
+    background:#222;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
 }
 
-body {
-  margin: 0;
-  background: #ddd;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+/* ===== HOME ===== */
+#home{
+    width:90vw;
+    max-width:800px;
+    height:90vh;
+    background:#cfeeff;
+    border-radius:20px;
+    position:relative;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    align-items:center;
+    gap:15px;
 }
 
-/* KHUNG GAME */
-.game {
-  position: relative;
-  width: 95vw;
-  height: 95vh;
-  max-width: 900px;
-  max-height: 500px;
-  background: #fff;
-  border-radius: 40px;
-  border: 4px solid #000;
-  overflow: hidden;
-
-  /* HÌNH NỀN */
-  background-image: url("https://picsum.photos/800/400");
-  background-size: cover;
-  background-position: center;
+button{
+    font-size:22px;
+    padding:15px 30px;
+    border-radius:15px;
+    border:none;
+    cursor:pointer;
 }
 
-/* TIỀN */
-.money {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 8px 18px;
-  border: 3px solid #000;
-  border-radius: 20px;
-  background: #fff;
-  font-weight: bold;
+#playBtn{ background:#4CAF50; color:white; }
+#afkBtn{ background:#ccc; }
+
+/* ===== GAME ===== */
+#game{
+    display:none;
+    width:95vw;
+    max-width:900px;
+    height:90vh;
+    background:#eee;
+    border-radius:20px;
+    position:relative;
+    overflow:hidden;
 }
 
-/* SHOP NHÂN VẬT */
-.shop {
-  position: absolute;
-  top: 80px;
-  right: 15px;
-  padding: 14px 12px;
-  border: 3px solid #000;
-  border-radius: 15px;
-  background: #fff;
-  font-weight: bold;
-  cursor: pointer;
+/* SAVE */
+#saveBtn{
+    position:absolute;
+    top:15px;
+    right:15px;
+    background:#ff9800;
+    color:white;
+    font-size:18px;
+    padding:12px 20px;
 }
 
-/* NÚT DƯỚI */
-.controls {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 15px;
+/* COIN */
+#coinBox{
+    position:absolute;
+    top:15px;
+    left:15px;
+    background:white;
+    padding:10px 20px;
+    border-radius:15px;
+    font-size:18px;
 }
 
-button {
-  padding: 12px 30px;
-  border: 3px solid #000;
-  border-radius: 15px;
-  background: #fff;
-  font-size: 16px;
-  cursor: pointer;
+/* LANES */
+.lane{
+    position:absolute;
+    left:0;
+    width:100%;
+    height:33.33%;
+    border-top:3px solid #333;
 }
+#lane1{ top:0; }
+#lane2{ top:33.33%; }
+#lane3{ top:66.66%; border-bottom:3px solid #333; }
 
-button:hover {
-  background: #eee;
+/* PLAYER */
+#player{
+    position:absolute;
+    left:60px;
+    width:40px;
+    height:80px;
 }
-
-/* MOBILE */
-@media (max-width: 600px) {
-  .game {
-    max-width: 360px;
-    max-height: 640px;
-    border-radius: 50px;
-  }
-
-  .controls {
-    bottom: 25px;
-  }
+.head{
+    width:30px;
+    height:30px;
+    border:3px solid black;
+    border-radius:50%;
+    margin:auto;
 }
-
-/* PC / IPAD */
-@media (min-width: 601px) {
-  .money {
-    left: 50%;
-    transform: translateX(-50%);
-  }
+.body{
+    width:4px;
+    height:40px;
+    background:black;
+    margin:auto;
 }
 </style>
 </head>
 
 <body>
 
-<div class="game">
-  <div class="money">💰 00000</div>
+<!-- HOME -->
+<div id="home">
+    <button id="playBtn">PLAY</button>
+    <button id="afkBtn">AFK</button>
+</div>
 
-  <div class="shop">nhân<br>vật</div>
+<!-- GAME -->
+<div id="game">
+    <button id="saveBtn">SAVE</button>
+    <div id="coinBox">💰 0</div>
 
-  <div class="controls">
-    <button onclick="play()">play</button>
-    <button onclick="afk()">afk</button>
-  </div>
+    <div class="lane" id="lane1"></div>
+    <div class="lane" id="lane2"></div>
+    <div class="lane" id="lane3"></div>
+
+    <div id="player">
+        <div class="head"></div>
+        <div class="body"></div>
+    </div>
 </div>
 
 <script>
-let money = 0;
+/* ===== DATA ===== */
+let coin = 0;
+let lane = 2; // 1 - 2 - 3
 
-function play() {
-  money += 10;
-  updateMoney();
+const home = document.getElementById("home");
+const game = document.getElementById("game");
+const player = document.getElementById("player");
+const coinBox = document.getElementById("coinBox");
+
+/* ===== WARNING ===== */
+alert("⚠️ Chơi xong nhớ lưu game, nếu không sẽ mất tiến trình chơi");
+
+/* ===== START GAME ===== */
+document.getElementById("playBtn").onclick = ()=>{
+    home.style.display="none";
+    game.style.display="block";
+    updatePlayer();
+};
+
+/* ===== SAVE ===== */
+document.getElementById("saveBtn").onclick = ()=>{
+    localStorage.setItem("runner_save", JSON.stringify({
+        coin:coin,
+        lane:lane
+    }));
+    alert("✅ Đã lưu game!");
+};
+
+/* ===== LOAD ===== */
+const saved = localStorage.getItem("runner_save");
+if(saved){
+    const data = JSON.parse(saved);
+    coin = data.coin;
+    lane = data.lane;
+    coinBox.innerText = "💰 " + coin;
 }
 
-function afk() {
-  money += 1;
-  updateMoney();
+/* ===== PLAYER MOVE ===== */
+function updatePlayer(){
+    const laneHeight = game.clientHeight / 3;
+    player.style.top = (lane-1)*laneHeight + laneHeight/2 - 40 + "px";
 }
+updatePlayer();
 
-function updateMoney() {
-  document.querySelector(".money").innerText = "💰 " + money.toString().padStart(5, "0");
-}
+/* ===== CONTROL ===== */
+document.addEventListener("keydown", e=>{
+    if(game.style.display!=="block") return;
+
+    if((e.key==="w" || e.key==="ArrowUp") && lane>1){
+        lane--;
+    }
+    if((e.key==="s" || e.key==="ArrowDown") && lane<3){
+        lane++;
+    }
+    updatePlayer();
+});
+
+/* ===== FAKE COIN RUN ===== */
+setInterval(()=>{
+    if(game.style.display==="block"){
+        coin++;
+        coinBox.innerText = "💰 " + coin;
+    }
+},1000);
 </script>
 
 </body>
