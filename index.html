@@ -6,8 +6,8 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
   background: #222;
+  font-family: Arial;
 }
 
 #menu, #warning, #game {
@@ -19,11 +19,11 @@ body {
 
 #menu {
   display: block;
-  background: linear-gradient(#cceeff, #ffffff);
+  background: #e6f3ff;
 }
 
 button {
-  font-size: 28px;
+  font-size: 26px;
   padding: 15px 40px;
   border-radius: 20px;
   border: none;
@@ -39,6 +39,13 @@ button {
   color: white;
 }
 
+#afkBtn {
+  position: absolute;
+  bottom: 40px;
+  left: 20px;
+  background: #aaa;
+}
+
 #saveBtn {
   position: absolute;
   top: 20px;
@@ -50,27 +57,29 @@ button {
   position: absolute;
   top: 20px;
   left: 20px;
-  font-size: 24px;
+  font-size: 22px;
   background: white;
   padding: 10px 20px;
   border-radius: 15px;
 }
 
 #warning {
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
   color: white;
   text-align: center;
   padding-top: 40vh;
 }
 
 #game {
-  background: #ddd;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: #ccc;
 }
 
 canvas {
   background: #eee;
-  display: block;
-  margin: auto;
+  border-radius: 20px;
 }
 </style>
 </head>
@@ -80,17 +89,18 @@ canvas {
 <div id="menu">
   <div id="money">💰 <span id="coinText">0</span></div>
   <button id="saveBtn">SAVE</button>
+  <button id="afkBtn">AFK</button>
   <button id="playBtn">PLAY</button>
 </div>
 
 <div id="warning">
   <h2>⚠️ CẢNH BÁO</h2>
-  <p>Chơi xong nhớ lưu game,<br>nếu không sẽ mất tiến trình chơi</p>
+  <p>Chơi xong nhớ lưu game<br>nếu không sẽ mất tiến trình</p>
   <button onclick="startGame()">OK</button>
 </div>
 
 <div id="game">
-  <canvas id="cv" width="900" height="450"></canvas>
+  <canvas id="cv" width="1000" height="500"></canvas>
 </div>
 
 <script>
@@ -105,7 +115,7 @@ document.getElementById("coinText").innerText = coins;
 
 document.getElementById("saveBtn").onclick = () => {
   localStorage.setItem("coins", coins);
-  alert("Đã lưu tiền!");
+  alert("Đã lưu!");
 };
 
 document.getElementById("playBtn").onclick = () => {
@@ -115,98 +125,104 @@ document.getElementById("playBtn").onclick = () => {
 
 function startGame() {
   warning.style.display = "none";
-  gameDiv.style.display = "block";
+  gameDiv.style.display = "flex";
   resetGame();
   loop();
 }
 
-/* GAME */
-const lanes = [100, 225, 350];
+/* ===== GAME ===== */
+const laneLines = [120, 250, 380];
+const lanes = [185, 315, 445]; // GIỮA CÁC LÀN
+
 let playerLane = 1;
 let legAngle = 0;
-
 let obstacles = [];
-let speed = 5;
+let speed = 6;
 let score = 0;
 let running = true;
 
-function resetGame() {
-  obstacles = [];
-  playerLane = 1;
-  score = 0;
-  running = true;
-}
+/* TOUCH (VUỐT) */
+let touchStartY = 0;
+canvas.addEventListener("touchstart", e => {
+  touchStartY = e.touches[0].clientY;
+});
+canvas.addEventListener("touchend", e => {
+  let dy = e.changedTouches[0].clientY - touchStartY;
+  if (dy < -40 && playerLane > 0) playerLane--;
+  if (dy > 40 && playerLane < 2) playerLane++;
+});
 
 document.addEventListener("keydown", e => {
   if (e.key === "ArrowUp" && playerLane > 0) playerLane--;
   if (e.key === "ArrowDown" && playerLane < 2) playerLane++;
 });
 
+function resetGame() {
+  obstacles = [];
+  score = 0;
+  playerLane = 1;
+  running = true;
+}
+
 function spawnObstacle() {
-  const type = Math.floor(Math.random() * 3);
   obstacles.push({
     x: canvas.width,
     lane: Math.floor(Math.random() * 3),
-    type
+    type: Math.floor(Math.random() * 3)
   });
 }
 
 function drawPlayer() {
-  const x = 150;
+  const x = 180;
   const y = lanes[playerLane];
 
-  // đầu
+  ctx.strokeStyle = "#000";
+
   ctx.beginPath();
-  ctx.arc(x, y - 40, 12, 0, Math.PI * 2);
+  ctx.arc(x, y - 35, 12, 0, Math.PI * 2);
   ctx.stroke();
 
-  // thân
   ctx.beginPath();
-  ctx.moveTo(x, y - 28);
-  ctx.lineTo(x, y + 20);
+  ctx.moveTo(x, y - 22);
+  ctx.lineTo(x, y + 18);
   ctx.stroke();
 
-  // tay
   ctx.beginPath();
-  ctx.moveTo(x - 15, y);
-  ctx.lineTo(x + 15, y);
+  ctx.moveTo(x - 12, y);
+  ctx.lineTo(x + 12, y);
   ctx.stroke();
 
-  // chân (chạy)
   legAngle += 0.2;
   ctx.beginPath();
-  ctx.moveTo(x, y + 20);
-  ctx.lineTo(x - 10, y + 40 + Math.sin(legAngle) * 10);
-  ctx.moveTo(x, y + 20);
-  ctx.lineTo(x + 10, y + 40 - Math.sin(legAngle) * 10);
+  ctx.moveTo(x, y + 18);
+  ctx.lineTo(x - 8, y + 40 + Math.sin(legAngle) * 8);
+  ctx.moveTo(x, y + 18);
+  ctx.lineTo(x + 8, y + 40 - Math.sin(legAngle) * 8);
   ctx.stroke();
 }
 
 function drawObstacle(o) {
   const y = lanes[o.lane];
-
-  if (o.type === 0) { // đá
+  if (o.type === 0) {
     ctx.fillStyle = "gray";
-    ctx.fillRect(o.x, y - 20, 40, 30);
+    ctx.fillRect(o.x, y - 15, 40, 30);
   }
-
-  if (o.type === 1) { // cây
+  if (o.type === 1) {
     ctx.fillStyle = "brown";
-    ctx.fillRect(o.x + 10, y - 20, 20, 40);
+    ctx.fillRect(o.x + 10, y - 10, 20, 40);
     ctx.fillStyle = "green";
     ctx.beginPath();
-    ctx.arc(o.x + 20, y - 30, 25, 0, Math.PI * 2);
+    ctx.arc(o.x + 20, y - 25, 25, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  if (o.type === 2) { // hố (vật cản mới)
+  if (o.type === 2) {
     ctx.fillStyle = "black";
-    ctx.fillRect(o.x, y + 20, 50, 10);
+    ctx.fillRect(o.x, y + 25, 50, 8);
   }
 }
 
-function checkCollision(o) {
-  return o.x < 180 && o.x > 120 && o.lane === playerLane;
+function hit(o) {
+  return o.x < 210 && o.x > 140 && o.lane === playerLane;
 }
 
 let frame = 0;
@@ -215,9 +231,8 @@ function loop() {
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // vẽ làn
-  ctx.strokeStyle = "#999";
-  lanes.forEach(y=>{
+  ctx.strokeStyle = "#aaa";
+  laneLines.forEach(y=>{
     ctx.beginPath();
     ctx.moveTo(0,y);
     ctx.lineTo(canvas.width,y);
@@ -229,18 +244,17 @@ function loop() {
   obstacles.forEach(o=>{
     o.x -= speed;
     drawObstacle(o);
-    if (checkCollision(o)) {
+    if (hit(o)) {
       running = false;
       coins += Math.floor(score / 10);
-      alert("Game Over!");
+      alert("Game Over");
       gameDiv.style.display = "none";
       menu.style.display = "block";
     }
   });
 
   obstacles = obstacles.filter(o=>o.x > -60);
-
-  if (frame % 90 === 0) spawnObstacle();
+  if (frame % 80 === 0) spawnObstacle();
 
   score++;
   frame++;
