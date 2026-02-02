@@ -2,207 +2,250 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Runner Coin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Runner Game</title>
 <style>
-*{
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-body{
-    margin:0;
-    background:#222;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #222;
 }
 
-/* ===== HOME ===== */
-#home{
-    width:90vw;
-    max-width:800px;
-    height:90vh;
-    background:#cfeeff;
-    border-radius:20px;
-    position:relative;
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    align-items:center;
-    gap:15px;
+#menu, #warning, #game {
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  position: relative;
 }
 
-button{
-    font-size:22px;
-    padding:15px 30px;
-    border-radius:15px;
-    border:none;
-    cursor:pointer;
+#menu {
+  display: block;
+  background: linear-gradient(#cceeff, #ffffff);
 }
 
-#playBtn{ background:#4CAF50; color:white; }
-#afkBtn{ background:#ccc; }
-
-/* ===== GAME ===== */
-#game{
-    display:none;
-    width:95vw;
-    max-width:900px;
-    height:90vh;
-    background:#eee;
-    border-radius:20px;
-    position:relative;
-    overflow:hidden;
+button {
+  font-size: 28px;
+  padding: 15px 40px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
 }
 
-/* SAVE */
-#saveBtn{
-    position:absolute;
-    top:15px;
-    right:15px;
-    background:#ff9800;
-    color:white;
-    font-size:18px;
-    padding:12px 20px;
+#playBtn {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50;
+  color: white;
 }
 
-/* COIN */
-#coinBox{
-    position:absolute;
-    top:15px;
-    left:15px;
-    background:white;
-    padding:10px 20px;
-    border-radius:15px;
-    font-size:18px;
+#saveBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: gold;
 }
 
-/* LANES */
-.lane{
-    position:absolute;
-    left:0;
-    width:100%;
-    height:33.33%;
-    border-top:3px solid #333;
+#money {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 15px;
 }
-#lane1{ top:0; }
-#lane2{ top:33.33%; }
-#lane3{ top:66.66%; border-bottom:3px solid #333; }
 
-/* PLAYER */
-#player{
-    position:absolute;
-    left:60px;
-    width:40px;
-    height:80px;
+#warning {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  text-align: center;
+  padding-top: 40vh;
 }
-.head{
-    width:30px;
-    height:30px;
-    border:3px solid black;
-    border-radius:50%;
-    margin:auto;
+
+#game {
+  background: #ddd;
 }
-.body{
-    width:4px;
-    height:40px;
-    background:black;
-    margin:auto;
+
+canvas {
+  background: #eee;
+  display: block;
+  margin: auto;
 }
 </style>
 </head>
 
 <body>
 
-<!-- HOME -->
-<div id="home">
-    <button id="playBtn">PLAY</button>
-    <button id="afkBtn">AFK</button>
+<div id="menu">
+  <div id="money">💰 <span id="coinText">0</span></div>
+  <button id="saveBtn">SAVE</button>
+  <button id="playBtn">PLAY</button>
 </div>
 
-<!-- GAME -->
+<div id="warning">
+  <h2>⚠️ CẢNH BÁO</h2>
+  <p>Chơi xong nhớ lưu game,<br>nếu không sẽ mất tiến trình chơi</p>
+  <button onclick="startGame()">OK</button>
+</div>
+
 <div id="game">
-    <button id="saveBtn">SAVE</button>
-    <div id="coinBox">💰 0</div>
-
-    <div class="lane" id="lane1"></div>
-    <div class="lane" id="lane2"></div>
-    <div class="lane" id="lane3"></div>
-
-    <div id="player">
-        <div class="head"></div>
-        <div class="body"></div>
-    </div>
+  <canvas id="cv" width="900" height="450"></canvas>
 </div>
 
 <script>
-/* ===== DATA ===== */
-let coin = 0;
-let lane = 2; // 1 - 2 - 3
+const menu = document.getElementById("menu");
+const warning = document.getElementById("warning");
+const gameDiv = document.getElementById("game");
+const canvas = document.getElementById("cv");
+const ctx = canvas.getContext("2d");
 
-const home = document.getElementById("home");
-const game = document.getElementById("game");
-const player = document.getElementById("player");
-const coinBox = document.getElementById("coinBox");
+let coins = Number(localStorage.getItem("coins")) || 0;
+document.getElementById("coinText").innerText = coins;
 
-/* ===== WARNING ===== */
-alert("⚠️ Chơi xong nhớ lưu game, nếu không sẽ mất tiến trình chơi");
-
-/* ===== START GAME ===== */
-document.getElementById("playBtn").onclick = ()=>{
-    home.style.display="none";
-    game.style.display="block";
-    updatePlayer();
+document.getElementById("saveBtn").onclick = () => {
+  localStorage.setItem("coins", coins);
+  alert("Đã lưu tiền!");
 };
 
-/* ===== SAVE ===== */
-document.getElementById("saveBtn").onclick = ()=>{
-    localStorage.setItem("runner_save", JSON.stringify({
-        coin:coin,
-        lane:lane
-    }));
-    alert("✅ Đã lưu game!");
+document.getElementById("playBtn").onclick = () => {
+  menu.style.display = "none";
+  warning.style.display = "block";
 };
 
-/* ===== LOAD ===== */
-const saved = localStorage.getItem("runner_save");
-if(saved){
-    const data = JSON.parse(saved);
-    coin = data.coin;
-    lane = data.lane;
-    coinBox.innerText = "💰 " + coin;
+function startGame() {
+  warning.style.display = "none";
+  gameDiv.style.display = "block";
+  resetGame();
+  loop();
 }
 
-/* ===== PLAYER MOVE ===== */
-function updatePlayer(){
-    const laneHeight = game.clientHeight / 3;
-    player.style.top = (lane-1)*laneHeight + laneHeight/2 - 40 + "px";
+/* GAME */
+const lanes = [100, 225, 350];
+let playerLane = 1;
+let legAngle = 0;
+
+let obstacles = [];
+let speed = 5;
+let score = 0;
+let running = true;
+
+function resetGame() {
+  obstacles = [];
+  playerLane = 1;
+  score = 0;
+  running = true;
 }
-updatePlayer();
 
-/* ===== CONTROL ===== */
-document.addEventListener("keydown", e=>{
-    if(game.style.display!=="block") return;
-
-    if((e.key==="w" || e.key==="ArrowUp") && lane>1){
-        lane--;
-    }
-    if((e.key==="s" || e.key==="ArrowDown") && lane<3){
-        lane++;
-    }
-    updatePlayer();
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp" && playerLane > 0) playerLane--;
+  if (e.key === "ArrowDown" && playerLane < 2) playerLane++;
 });
 
-/* ===== FAKE COIN RUN ===== */
-setInterval(()=>{
-    if(game.style.display==="block"){
-        coin++;
-        coinBox.innerText = "💰 " + coin;
+function spawnObstacle() {
+  const type = Math.floor(Math.random() * 3);
+  obstacles.push({
+    x: canvas.width,
+    lane: Math.floor(Math.random() * 3),
+    type
+  });
+}
+
+function drawPlayer() {
+  const x = 150;
+  const y = lanes[playerLane];
+
+  // đầu
+  ctx.beginPath();
+  ctx.arc(x, y - 40, 12, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // thân
+  ctx.beginPath();
+  ctx.moveTo(x, y - 28);
+  ctx.lineTo(x, y + 20);
+  ctx.stroke();
+
+  // tay
+  ctx.beginPath();
+  ctx.moveTo(x - 15, y);
+  ctx.lineTo(x + 15, y);
+  ctx.stroke();
+
+  // chân (chạy)
+  legAngle += 0.2;
+  ctx.beginPath();
+  ctx.moveTo(x, y + 20);
+  ctx.lineTo(x - 10, y + 40 + Math.sin(legAngle) * 10);
+  ctx.moveTo(x, y + 20);
+  ctx.lineTo(x + 10, y + 40 - Math.sin(legAngle) * 10);
+  ctx.stroke();
+}
+
+function drawObstacle(o) {
+  const y = lanes[o.lane];
+
+  if (o.type === 0) { // đá
+    ctx.fillStyle = "gray";
+    ctx.fillRect(o.x, y - 20, 40, 30);
+  }
+
+  if (o.type === 1) { // cây
+    ctx.fillStyle = "brown";
+    ctx.fillRect(o.x + 10, y - 20, 20, 40);
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.arc(o.x + 20, y - 30, 25, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if (o.type === 2) { // hố (vật cản mới)
+    ctx.fillStyle = "black";
+    ctx.fillRect(o.x, y + 20, 50, 10);
+  }
+}
+
+function checkCollision(o) {
+  return o.x < 180 && o.x > 120 && o.lane === playerLane;
+}
+
+let frame = 0;
+function loop() {
+  if (!running) return;
+
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // vẽ làn
+  ctx.strokeStyle = "#999";
+  lanes.forEach(y=>{
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(canvas.width,y);
+    ctx.stroke();
+  });
+
+  drawPlayer();
+
+  obstacles.forEach(o=>{
+    o.x -= speed;
+    drawObstacle(o);
+    if (checkCollision(o)) {
+      running = false;
+      coins += Math.floor(score / 10);
+      alert("Game Over!");
+      gameDiv.style.display = "none";
+      menu.style.display = "block";
     }
-},1000);
+  });
+
+  obstacles = obstacles.filter(o=>o.x > -60);
+
+  if (frame % 90 === 0) spawnObstacle();
+
+  score++;
+  frame++;
+  requestAnimationFrame(loop);
+}
 </script>
 
 </body>
